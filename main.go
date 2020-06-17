@@ -39,18 +39,20 @@ func getExchangeRate() ValCurs {
 	}
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("err")
+		log.Panic(err)
 	}
 	v := ValCurs{}
 	err = xml.Unmarshal(data, &v)
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		log.Panic(err)
 	}
 	return v
 }
 
 func commandHandler(command string, arg string) string {
 	switch command {
+	case "help":
+		return "Справочная информация ..."
 	case "exchange_rate":
 		switch arg {
 		case "Доллар США":
@@ -66,6 +68,7 @@ func commandHandler(command string, arg string) string {
 				}
 			}
 		}
+		return "Получение информации о такой валюте невозможно."
 	}
 	return ""
 }
@@ -93,7 +96,7 @@ func main() {
 			arg := update.Message.CommandArguments()
 			res := commandHandler(command, arg)
 			if res == "" {
-				res = "Получение информации о такой валюте невозможно"
+				res = "Исполнение такой команды невозможно."
 			}
 			update.Message.Text = res
 			message := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
